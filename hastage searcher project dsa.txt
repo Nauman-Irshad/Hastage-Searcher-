@@ -1,0 +1,200 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <unordered_map>
+#include <algorithm> // For transform
+#include <cctype>    // For toupper
+#include <iomanip>   // For setw
+using namespace std;
+
+// Function to display the categories in columns with aligned separators
+void displayCategories(const vector<string>& categories) {
+    int numColumns = 5; // Number of columns to display
+    int columnWidth = 20; // Width of each column
+
+    // Calculate total number of rows needed
+    int numRows = (categories.size() + numColumns - 1) / numColumns;
+
+    // Display categories in columns with numbers
+    for (int row = 0; row < numRows; ++row) {
+        for (int col = 0; col < numColumns; ++col) {
+            int index = col * numRows + row;
+            if (index < categories.size()) {
+                int number = index + 1; // Display category number (1-indexed)
+                cout << setw(3) << right << number << ". " << setw(columnWidth - 3) << left << categories[index];
+            }
+            else {
+                cout << setw(columnWidth) << " "; // Empty space if no category to display
+            }
+        }
+        cout << endl;
+    }
+}
+
+// Function to display the hashtags for the selected category in a formatted block with 5 hashtags per line
+void displayHashtags(const vector<string>& hashtags) {
+    cout << endl;
+    cout << "Here are some hashtags for your selected category:" << endl;
+    cout << "-----------------------------------------------" << endl;
+    for (int i = 0; i < hashtags.size(); ++i) {
+        cout << "#" << hashtags[i] << " ";
+        if ((i + 1) % 5 == 0) {
+            cout << endl;
+        }
+    }
+
+    cout << "-----------------------------------------------" << endl;
+}
+
+// Function to suggest related hashtags based on user input
+void suggestRelatedHashtags(const unordered_map<string, vector<string>>& hashtagMap, const string& categoryName) {
+    string uppercaseCategory = categoryName;
+    transform(uppercaseCategory.begin(), uppercaseCategory.end(), uppercaseCategory.begin(), ::toupper);
+
+    if (hashtagMap.find(uppercaseCategory) != hashtagMap.end()) {
+        const vector<string>& relatedHashtags = hashtagMap.at(uppercaseCategory);
+        displayHashtags(relatedHashtags);
+    }
+    else {
+        cout << "No related hashtags found for category " << categoryName << "." << endl;
+    }
+}
+
+int main() {
+    // Example hashtags and related hashtags (for demonstration)
+    unordered_map<string, vector<string>> hashtagMap = {
+        {"PHYSICS", {"Science", "Mathematics", "Astronomy", "Engineering", "Quantum"}},
+        {"MAGIC", {"Illusion", "Magician", "Trick", "SleightOfHand", "MagicTrick"}},
+        {"TECHNOLOGY", {"Innovation", "Tech", "Gadgets", "Digital", "FutureTech"}},
+        {"HEALTH", {"Fitness", "Wellness", "Nutrition", "Medicine", "HealthyLiving"}},
+        {"TRAVEL", {"Wanderlust", "Adventure", "Explore", "Vacation", "TravelGram"}},
+        {"FOOD", {"Foodie", "Cooking", "Recipes", "HealthyEating", "FoodPhotography"}},
+        {"FASHION", {"Style", "Fashionista", "Clothing", "Accessories", "OOTD"}},
+        {"EDUCATION", {"Learning", "School", "Knowledge", "Teachers", "EducationForAll"}},
+        {"FITNESS", {"Workout", "Exercise", "GymLife", "FitnessMotivation", "FitFam"}},
+        {"SPORTS", {"Athlete", "SportsNews", "TeamSports", "SportsPhotography", "Fitness"}},
+        {"MUSIC", {"Musician", "Concert", "MusicProduction", "MusicLover", "Songwriter"}},
+        {"MOVIES", {"Film", "MovieNight", "Cinema", "Actors", "MovieQuotes"}},
+        {"PHOTOGRAPHY", {"PhotoOfTheDay", "Photographer", "Camera", "PortraitPhotography", "NaturePhotography"}},
+        {"NATURE", {"NatureLovers", "WildlifePhotography", "OutdoorAdventure", "ExploreNature", "NatureGram"}},
+        {"ART", {"Artistic", "Painting", "Sculpture", "ArtGallery", "ArtLovers"}},
+        {"GAMING", {"Gamer", "GamingCommunity", "VideoGames", "PCGaming", "ConsoleGaming"}},
+        {"BOOKS", {"Bookworm", "ReadingList", "BookRecommendations", "Literature", "Library"}},
+        {"SCIENCE", {"Scientist", "Research", "Innovation", "ScienceCommunication", "STEM"}},
+        {"BUSINESS", {"Entrepreneur", "Startup", "BusinessTips", "Marketing", "Finance"}},
+        {"FINANCE", {"Investing", "StockMarket", "FinancialPlanning", "MoneyManagement", "Wealth"}},
+        {"LIFESTYLE", {"LifeGoals", "HealthyLifestyle", "Balance", "SelfCare", "Wellbeing"}},
+        {"DIY", {"DoItYourself", "Crafting", "DIYProjects", "HomeImprovement", "Handmade"}},
+        {"PETS", {"PetLovers", "DogLover", "CatLover", "PetsOfInstagram", "PetPhotography"}},
+        {"PARENTING", {"ParentLife", "MomLife", "DadLife", "ParentingTips", "Family"}},
+        {"BEAUTY", {"BeautyBlogger", "Skincare", "MakeupAddict", "BeautyTips", "Cosmetics"}},
+        {"COOKING", {"CookingAtHome", "Baking", "Recipes", "ChefLife", "Foodie"}},
+        {"CRAFTS", {"Crafty", "Handmade", "CraftingCommunity", "DIYCrafts", "ArtAndCraft"}},
+        {"GARDENING", {"Gardener", "GardenDesign", "PlantLovers", "GreenThumb", "UrbanGardening"}},
+        {"AUTOMOTIVE", {"CarLovers", "CarEnthusiast", "AutoDetailing", "Driving", "VintageCars"}},
+        {"REAL ESTATE", {"Property", "HomeOwnership", "RealEstateAgent", "HouseHunting", "DreamHome"}},
+        {"DATING", {"DatingLife", "Relationships", "LoveQuotes", "DatingAdvice", "Romantic"}},
+        {"CAREER", {"CareerGoals", "JobHunting", "ProfessionalDevelopment", "WorkLife", "CareerSuccess"}},
+        {"HOME DECOR", {"InteriorDesign", "HomeStyle", "DecorInspiration", "HomeImprovement", "Design"}},
+        {"SPIRITUALITY", {"Mindfulness", "SpiritualGrowth", "Meditation", "Faith", "PositiveVibes"}},
+        {"HISTORY", {"Historian", "HistoricalPlaces", "HistoryBuff", "WorldHistory", "HistoryGeek"}},
+        {"POLITICS", {"PoliticalScience", "Government", "CurrentAffairs", "PoliticalDebate", "PoliticalTheory"}},
+        {"CULTURE", {"CulturalHeritage", "CulturalDiversity", "CulturalExchange", "WorldCulture", "CulturalArts"}},
+        {"LUXURY", {"LuxuryLiving", "LuxuryTravel", "LuxuryFashion", "LuxuryCars", "HighEnd"}},
+        {"ADVENTURE", {"OutdoorAdventure", "ExploreMore", "AdventureTime", "AdventureSeeker", "ExtremeSports"}},
+        {"ECONOMICS", {"EconomicDevelopment", "MarketTrends", "GlobalEconomy", "EconomicPolicy", "EconomicGrowth"}},
+        {"ENVIRONMENT", {"EnvironmentalConservation", "ClimateAction", "GreenLiving", "Sustainability", "EarthDay"}},
+        {"SPACE", {"SpaceExploration", "NASA", "Astronomy", "Astrophysics", "SpacePhotography"}},
+        {"BIOLOGY", {"BiologyClass", "LifeScience", "Biochemistry", "Ecology", "Genetics"}},
+        {"ASTRONOMY", {"Stargazing", "Cosmos", "MeteorShower", "Galaxies", "Stars"}},
+        {"GEOLOGY", {"Geologist", "EarthScience", "GeologicalFormation", "RocksAndMinerals", "GeologicalSurvey"}},
+        {"MATHEMATICS", {"MathGeek", "MathematicalTheory", "MathIsFun", "Geometry", "Algebra"}},
+        {"ENGINEERING", {"EngineerLife", "EngineeringDesign", "InnovativeEngineering", "CivilEngineering", "MechanicalEngineering"}},
+        {"LAW", {"LegalAdvice", "LawyerLife", "LegalSystem", "CriminalJustice", "LawSchool"}},
+        {"ARCHITECTURE", {"ArchitectureLovers", "ArchitecturalDesign", "UrbanArchitecture", "BuildingDesign", "ArchitecturePhotography"}},
+            {"PSYCHOLOGY", {"Psychologist", "BehavioralScience", "CognitivePsychology", "Therapy", "MentalHealth"}},
+        {"PHILOSOPHY", {"Philosopher", "PhilosophicalThoughts", "Ethics", "PhilosophyOfLife", "Existentialism"}},
+        {"SOCIOLOGY", {"SocialScience", "SocietalIssues", "CulturalStudies", "SocialResearch", "SociologyOfEducation"}},
+        {"ANTHROPOLOGY", {"Anthropologist", "HumanCulture", "AnthropologicalResearch", "CulturalAnthropology", "Archaeology"}},
+        {"ARCHAEOLOGY", {"Archaeologist", "AncientHistory", "ArchaeologicalDig", "ArchaeologicalSite", "Prehistoric"}},
+        {"LINGUISTICS", {"Linguist", "LanguageStudies", "Phonetics", "GrammarNazi", "LanguageLearning"}},
+        {"THEATER", {"TheaterLife", "StagePerformance", "Drama", "TheaterArt", "Broadway"}},
+        {"DANCE", {"DanceLife", "DancePerformance", "Ballet", "HipHopDance", "ContemporaryDance"}},
+        {"OPERA", {"OperaLover", "OperaticMusic", "OperaHouse", "OperaticPerformance", "ClassicalMusic"}},
+        {"CIRCUS", {"CircusShow", "CircusPerformance", "CircusArts", "Acrobatics", "Clowning"}},
+        {"COMEDY", {"StandUpComedy", "ComedyShow", "ComedyCentral", "FunnyVideos", "Humor"}},
+        {"FITNESS MODELING", {"FitnessModel", "FitnessPhotography", "FitnessLifestyle", "BodyFitness", "FitnessMotivation"}},
+        {"BODYBUILDING", {"Bodybuilder", "MuscleBuilding", "BodyTransformation", "StrengthTraining", "GymRat"}},
+        {"MARTIAL ARTS", {"MartialArtist", "Karate", "JiuJitsu", "Taekwondo", "MMA"}},
+        {"EXTREME SPORTS", {"ExtremeAthlete", "ExtremeSportsLife", "AdrenalineJunkie", "ActionSports", "AdventureSports"}},
+        {"SURFING", {"SurferLife", "SurfingCommunity", "SurfingLife", "SurfingPhotography", "WaveRider"}},
+        {"SKATEBOARDING", {"SkaterLife", "SkateboardingCommunity", "SkateboardTricks", "Skatepark", "StreetSkateboarding"}},
+        {"SKIING", {"SkierLife", "SkiingCommunity", "SkiingHoliday", "SkiingFun", "MountainSkiing"}},
+        {"SNOWBOARDING", {"SnowboarderLife", "SnowboardingCommunity", "SnowboardTricks", "SnowboardingFun", "SnowboardPark"}},
+        {"RUNNING", {"RunnerLife", "RunningCommunity", "RunningMotivation", "MarathonRunner", "TrailRunning"}},
+        {"CYCLING", {"CyclistLife", "CyclingCommunity", "BikeRide", "MountainBiking", "RoadCycling"}},
+        {"TRIATHLON", {"TriathleteLife", "TriathlonCommunity", "IronmanTriathlon", "TriathlonTraining", "SwimBikeRun"}},
+        {"SWIMMING", {"SwimmerLife", "SwimmingCommunity", "PoolSwimming", "OpenWaterSwimming", "SwimmingTraining"}},
+        {"HIKING", {"HikerLife", "HikingCommunity", "MountainHiking", "NatureHiking", "TrailHiking"}}
+    };
+
+    // Categories list (using example categories for demonstration)
+    vector<string> categories = {
+        "Physics", "Magic", "Technology", "Health", "Travel",
+        "Food", "Fashion", "Education", "Fitness", "Sports",
+        "Music", "Movies", "Photography", "Nature", "Art",
+        "Gaming", "Books", "Science", "Business", "Finance",
+        "Lifestyle", "DIY", "Pets", "Parenting", "Beauty",
+        "Cooking", "Crafts", "Gardening", "Automotive", "Real Estate",
+        "Dating", "Career", "Home Decor", "Spirituality", "History",
+        "Politics", "Culture", "Luxury", "Adventure", "Economics",
+        "Environment", "Space", "Biology", "Astronomy", "Geology",
+        "Mathematics", "Engineering", "Law", "Architecture", "Psychology",
+        "Philosophy", "Sociology", "Anthropology", "Archaeology", "Linguistics",
+        "Theater", "Dance", "Opera", "Circus", "Comedy",
+        "Fitness Modeling", "Bodybuilding", "Martial Arts", "Extreme Sports", "Surfing",
+        "Skateboarding", "Skiing", "Snowboarding", "Running", "Cycling",
+        "Triathlon", "Swimming", "Hiking"
+    };
+
+    bool exitProgram = false;
+
+    while (!exitProgram) {
+        // Display categories in columns with numbers
+        displayCategories(categories);
+
+        // Get user input for category selection
+        int choice;
+        cout << endl;
+        cout << "Enter the number of your chosen category (1 to 75): ";
+        cin >> choice;
+
+        // Validate user input
+        if (choice >= 1 && choice <= categories.size()) {
+            string selectedCategory = categories[choice - 1];
+            suggestRelatedHashtags(hashtagMap, selectedCategory);
+        }
+        else {
+            cout << "Invalid choice. Please enter a number between 1 and 75." << endl;
+        }
+
+        // Ask user if they want to continue or exit
+        int continueOption;
+        cout << "Enter 1 to search again or 2 to exit: ";
+        cin >> continueOption;
+
+        if (continueOption == 2) {
+            exitProgram = true;
+        }
+        else if (continueOption != 1) {
+            cout << "Invalid option. Exiting program." << endl;
+            exitProgram = true;
+        }
+
+        // Clear input buffer
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+
+    return 0;
+}
+
